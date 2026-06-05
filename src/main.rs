@@ -44,16 +44,16 @@ fn run_app<B: ratatui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Resu
         terminal.draw(|f| {
             let size = f.area();
 
-            // Fullscreen border
+            // Fullscreen border around the entire app
             let block = Block::default()
                 .borders(Borders::ALL)
                 .title(" SPT Mod Forge ");
 
-            f.render_widget(block.clone(), size);
+            f.render_widget(&block, size);
 
             let inner = block.inner(size);
 
-            // Center "Hello World" in the middle using layouts
+            // Center "Hello World" vertically and horizontally
             let vertical = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([
@@ -77,17 +77,19 @@ fn run_app<B: ratatui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Resu
             f.render_widget(hello, horizontal[1]);
         })?;
 
-        // Very basic event handling: exit on q, Esc, or Ctrl+C
-        if let Event::Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press {
-                match key.code {
-                    KeyCode::Char('q') | KeyCode::Esc => return Ok(()),
-                    KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                        return Ok(());
-                    }
-                    _ => {}
+        // Basic event loop. Redraws on resize too.
+        match event::read()? {
+            Event::Key(key) if key.kind == KeyEventKind::Press => match key.code {
+                KeyCode::Char('q') | KeyCode::Esc => return Ok(()),
+                KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                    return Ok(());
                 }
+                _ => {}
+            },
+            Event::Resize(_, _) => {
+                // Next loop iteration will redraw at new size
             }
+            _ => {}
         }
     }
 }
