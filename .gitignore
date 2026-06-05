@@ -34,3 +34,7 @@ Thumbs.db
 
 # pre-commit
 .pre-commit-config.yaml
+
+# Git worktrees (isolated dev workspaces per using-git-worktrees skill)
+.worktrees/
+worktrees/
