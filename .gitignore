@@ -3,15 +3,17 @@
 **/*.rs.bk
 *.pdb
 
-# Build artifacts
+# Build artifacts (from nix build)
 result
 result-*
 
-# Nix / devenv
+# Nix / devenv / direnv
 .direnv/
 .devenv/
+devenv.local.nix
+devenv.local.yaml
 
-# .envrc is committed on purpose (for direnv + `use devenv`)
+# .envrc is committed on purpose (for direnv + `use devenv` or `use flake`)
 # Run `direnv allow` after cloning.
 
 # Project specific
@@ -30,16 +32,5 @@ Thumbs.db
 /tmp/
 *.tmp
 
-# Devenv
-.devenv*
-devenv.local.nix
-devenv.local.yaml
-
-# direnv
-.direnv
-
 # pre-commit
 .pre-commit-config.yaml
-
-
-
