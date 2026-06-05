@@ -41,6 +41,11 @@
           };
 
           spt-mod-forge = buildPlatform.buildRustPackage {
+            # NOTE: When rusqlite(bundled), zip, etc are added we rely on rustPlatform
+            # vendoring. If build fails in CI/nix, add:
+            # nativeBuildInputs = [ pkgs.pkg-config ];
+            # buildInputs = [ ];  # empty for pure-rust + bundled paths
+
             pname = "spt-mod-forge";
             version = "0.1.0";
 
