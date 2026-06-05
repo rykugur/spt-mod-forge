@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://devenv.sh/devenv.schema.json
+inputs:
+  nixpkgs:
+    url: github:cachix/devenv-nixpkgs/rolling
+
+  # Declared so that devenv.nix can pull in the rust-overlay and give
+  # `devenv shell` users the exact same Rust toolchain that
+  # `nix develop` users get from shells/common.nix.
+  rust-overlay:
+    url: github:oxalica/rust-overlay
+    inputs:
+      nixpkgs:
+        follows: nixpkgs
+
+# No other special config needed here — see devenv.nix for the actual
+# environment definition (which deliberately shares most of its
+# definition with the plain Nix dev shell).

@@ -1,0 +1,42 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Build artifacts
+result
+result-*
+
+# Nix / devenv
+.direnv/
+.devenv/
+
+# .envrc is committed on purpose (for direnv + `use devenv`)
+# Run `direnv allow` after cloning.
+
+# Project specific
+**/.superpowers/
+*.log
+
+# Editor / OS
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary
+/tmp/
+*.tmp
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
