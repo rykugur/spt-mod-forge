@@ -22,7 +22,39 @@
       ];
 
       perSystem =
-        { config, pkgs, system, ... }:
+        { pkgs, system, ... }:
+        let
+          # Use the same custom Rust toolchain (via rust-overlay) for building the
+          # release binary as we use in the dev shell. This ensures consistency.
+          rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+            extensions = [
+              "rust-src"
+              "rust-analyzer"
+              "clippy"
+              "rustfmt"
+            ];
+          };
+
+          buildPlatform = pkgs.makeRustPlatform {
+            cargo = rustToolchain;
+            rustc = rustToolchain;
+          };
+
+          spt-mod-forge = buildPlatform.buildRustPackage {
+            pname = "spt-mod-forge";
+            version = "0.1.0";
+
+            src = ./.;
+
+            cargoLock = {
+              lockFile = ./Cargo.lock;
+            };
+
+            # No native dependencies needed for this basic Ratatui + Crossterm TUI.
+            # When we add more (e.g. for archive handling later) we can extend
+            # buildInputs / nativeBuildInputs here.
+          };
+        in
         {
           # Apply rust-overlay globally for this system so that shells/common.nix
           # (and anything else) gets the enhanced packages.
@@ -41,6 +73,22 @@
           #
           # No `devenv` CLI is required. No extra tools beyond Nix.
           devShells.default = import ./shells/default.nix { inherit pkgs; };
+
+          packages = {
+            inherit spt-mod-forge;
+            default = spt-mod-forge;
+          };
+
+          apps = {
+            spt-mod-forge = {
+              type = "app";
+              program = "${spt-mod-forge}/bin/spt-mod-forge";
+            };
+            default = {
+              type = "app";
+              program = "${spt-mod-forge}/bin/spt-mod-forge";
+            };
+          };
 
           # `nix fmt` support
           formatter = pkgs.alejandra;
