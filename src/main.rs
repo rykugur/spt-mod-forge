@@ -1,16 +1,11 @@
 use std::io;
 
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind, KeyModifiers},
+    event::{DisableMouseCapture, EnableMouseCapture},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use ratatui::{
-    backend::CrosstermBackend,
-    layout::{Alignment, Constraint, Direction, Layout},
-    widgets::{Block, Borders, Paragraph},
-    Terminal,
-};
+use ratatui::{backend::CrosstermBackend, Terminal};
 
 fn main() -> io::Result<()> {
     // Setup terminal
@@ -40,56 +35,7 @@ fn main() -> io::Result<()> {
 }
 
 fn run_app<B: ratatui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
-    loop {
-        terminal.draw(|f| {
-            let size = f.area();
-
-            // Fullscreen border around the entire app
-            let block = Block::default()
-                .borders(Borders::ALL)
-                .title(" SPT Mod Forge ");
-
-            f.render_widget(&block, size);
-
-            let inner = block.inner(size);
-
-            // Center "Hello World" vertically and horizontally
-            let vertical = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints([
-                    Constraint::Percentage(40),
-                    Constraint::Length(1),
-                    Constraint::Percentage(40),
-                ])
-                .split(inner);
-
-            let horizontal = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([
-                    Constraint::Percentage(35),
-                    Constraint::Percentage(30),
-                    Constraint::Percentage(35),
-                ])
-                .split(vertical[1]);
-
-            let hello = Paragraph::new("Hello World").alignment(Alignment::Center);
-
-            f.render_widget(hello, horizontal[1]);
-        })?;
-
-        // Basic event loop. Redraws on resize too.
-        match event::read()? {
-            Event::Key(key) if key.kind == KeyEventKind::Press => match key.code {
-                KeyCode::Char('q') | KeyCode::Esc => return Ok(()),
-                KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                    return Ok(());
-                }
-                _ => {}
-            },
-            Event::Resize(_, _) => {
-                // Next loop iteration will redraw at new size
-            }
-            _ => {}
-        }
-    }
+    // Delegate to the real App coordinator + event loop + phases (Task 13).
+    // Terminal setup/restore kept exactly in main() as required.
+    spt_mod_forge::app::run_app(terminal)
 }
