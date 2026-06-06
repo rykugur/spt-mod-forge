@@ -5,6 +5,16 @@
 // Submodule files (src/error.rs, src/config.rs) are resolved relative to src/ .
 mod error;
 mod config;
+mod theme;
+mod spt; // Task 6: SptInstall resolver; mod decl here for --lib test discovery (per prior tasks' pattern; will be left unstaged at commit per plan's `git add src/spt.rs` only)
+mod state; // Task 7: StateDb + schema for managed_mods/installed_files + desired + compute_pending diff; mod decl here for --lib test discovery (per prior tasks' pattern; will be left unstaged at commit per plan's `git add src/state.rs` only)
+mod cache; // Task 8: Cache layer (lists + downloads, toggle, force, SPT_CACHE_DIR); mod decl here for --lib test discovery (per prior tasks' pattern; will be left unstaged at commit per plan's `git add src/cache.rs` only)
+mod forge; // Task 9: Forge API client (token env-only, blocking, list+versions+download, cache integration); mod decl here for --lib test discovery (per prior tasks' pattern; will be left unstaged at commit per plan's `git add src/forge.rs` only)
+mod install; // Task 10: install/uninstall logic (simple direct); mod decl here for --lib test discovery (per prior pattern; will be left unstaged at final commit, only src/install.rs git add'ed)
+mod animation; // Task 11: Rattles braille animation integration (in render + loop); mod decl here for --lib test discovery (per prior pattern; will be left unstaged at commit, only src/animation.rs git add'ed)
+mod ui; // Task 12: UI panes and modals (list, detail, palette fuzzy, settings, commit review); mod decl here for --lib test discovery (per prior tasks' pattern; will be left unstaged at commit, only the src/ui/*.rs files git add'ed per plan)
+
+pub mod app; // Task 13: The App coordinator + event loop + all interactions + phases (integration replacing hello-world TUI); mod decl here for lib/bin visibility (left unstaged at commit; only src/app.rs + src/main.rs git added per plan)
 
 use serde::{Deserialize, Serialize};
 

@@ -141,7 +141,7 @@ impl App {
                     self.mods = fmods
                         .into_iter()
                         .map(|fm| {
-                            dbmap.get(&fm.id).cloned().unwrap_or_else(|| ManagedMod {
+                            dbmap.get(&fm.id).cloned().unwrap_or(ManagedMod {
                                 forge_id: fm.id,
                                 guid: fm.guid,
                                 name: fm.name,
@@ -152,7 +152,7 @@ impl App {
                         })
                         .collect();
                     // Include any DB-only (previously managed/"my") not present in current curated response
-                    for (_, m) in &dbmap {
+                    for m in dbmap.values() {
                         if !self.mods.iter().any(|mm| mm.forge_id == m.forge_id) {
                             self.mods.push(m.clone());
                         }
@@ -347,22 +347,21 @@ impl App {
             ])
             .split(r);
 
-        let popup = Layout::default()
+        Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
                 Constraint::Percentage((100 - percent_x) / 2),
                 Constraint::Percentage(percent_x),
                 Constraint::Percentage((100 - percent_x) / 2),
             ])
-            .split(popup_layout[1])[1];
-        popup
+            .split(popup_layout[1])[1]
     }
 
     /// Returns true if should quit the run loop.
     fn handle_key(&mut self, key: KeyEvent) -> bool {
         // Use replace to avoid overlapping mutable borrows when destructuring phase and calling &mut self methods.
         let phase = std::mem::replace(&mut self.phase, Phase::Main);
-        let quit = match phase {
+        match phase {
             Phase::Main => {
                 self.phase = Phase::Main;
                 self.handle_main_key(key)
@@ -390,8 +389,7 @@ impl App {
                 self.phase = Phase::SptPrompt { input };
                 q
             }
-        };
-        quit
+        }
     }
 
     fn handle_main_key(&mut self, key: KeyEvent) -> bool {
@@ -842,7 +840,7 @@ impl App {
 pub fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
     match App::new() {
         Ok(app) => app.run(terminal),
-        Err(e) => Err(io::Error::new(io::ErrorKind::Other, format!("app init failed: {}", e))),
+        Err(e) => Err(io::Error::other(format!("app init failed: {}", e))),
     }
 }
 

@@ -15,13 +15,9 @@ pub struct Config {
     pub ui: UiConfig,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct SptConfig {
     pub path: String,
-}
-
-impl Default for SptConfig {
-    fn default() -> Self { Self { path: String::new() } }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,6 +60,11 @@ pub fn config_path() -> Result<PathBuf> {
 pub fn default_cache_root() -> Result<PathBuf> {
     let dirs = project_dirs()?;
     Ok(dirs.cache_dir().to_path_buf())
+}
+
+pub fn state_db_path() -> Result<PathBuf> {
+    let dirs = project_dirs()?;
+    Ok(dirs.config_dir().join("state.db"))
 }
 
 // load_config: env overrides > file > defaults. Never reads CWD.
@@ -161,8 +162,8 @@ mod tests {
         let base = std::env::temp_dir().join(format!("spt-mod-forge-test-config-{}", test_id));
         let config_dir = base.join("spt-mod-forge"); // matches what ProjectDirs will compute: XDG_CONFIG_HOME/<project>
         fs::create_dir_all(&config_dir).expect("create temp config dir");
-        // (one-line note for dir creation coverage: save_config's create_dir_all path is analogous; this test manually sets up to exercise file load precedence)
 
+        // (one-line note for dir creation coverage: save_config's create_dir_all path is analogous; this test manually sets up to exercise file load precedence)
         let temp_toml = config_dir.join("config.toml");
         // TOML exercising non-defaults for file load
         let toml_content = r#"

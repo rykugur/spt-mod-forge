@@ -14,7 +14,7 @@ use std::fs;
 use std::io::Cursor;
 use std::path::Path;
 
-use zip::{ZipArchive, ZipWriter, write::FileOptions};
+use zip::ZipArchive;
 
 use crate::cache::Cache;
 use crate::error::{AppError, Result};
@@ -171,7 +171,7 @@ fn pick_best_compatible_version(versions: &[ForgeModVersion], spt_version: &str)
     let spt = spt_version.trim();
     // exact
     if let Some(v) = versions.iter().find(|vv| {
-        vv.spt_version.as_deref().map_or(false, |sv| sv.trim() == spt)
+        vv.spt_version.as_deref().is_some_and(|sv| sv.trim() == spt)
     }) {
         return Some(v.clone());
     }
@@ -247,10 +247,9 @@ fn add_ancestor_dirs(recorded: &mut HashSet<(String, bool)>, rel: &str) {
 mod tests {
     use super::*;
     use std::io::Write;
-    use std::sync::Mutex;
 
-    // Serialize any env/token tests.
-    static TEST_ENV_LOCK: Mutex<()> = Mutex::new(());
+    // Test-only zip writer items (synthetic zips for TDD; not used at crate scope).
+    use zip::{ZipWriter, write::FileOptions};
 
     fn make_temp_spt_with_markers() -> (tempfile::TempDir, SptInstall) {
         let tmp = tempfile::tempdir().expect("temp spt root");

@@ -36,7 +36,7 @@ pub fn fuzzy_filter<'a>(query: &str, items: &'a [&'a str]) -> Vec<(i32, &'a str)
         })
         .filter(|(s, _)| *s > 0)
         .collect();
-    scored.sort_by(|a, b| b.0.cmp(&a.0)); // desc score
+    scored.sort_by_key(|b| std::cmp::Reverse(b.0)); // desc score
     scored
 }
 
@@ -114,15 +114,14 @@ fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
         ])
         .split(r);
 
-    let popup = ratatui::layout::Layout::default()
+    ratatui::layout::Layout::default()
         .direction(ratatui::layout::Direction::Horizontal)
         .constraints([
             ratatui::layout::Constraint::Percentage((100 - percent_x) / 2),
             ratatui::layout::Constraint::Percentage(percent_x),
             ratatui::layout::Constraint::Percentage((100 - percent_x) / 2),
         ])
-        .split(popup_layout[1])[1];
-    popup
+        .split(popup_layout[1])[1]
 }
 
 #[cfg(test)]

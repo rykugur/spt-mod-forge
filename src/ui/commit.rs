@@ -20,6 +20,7 @@ use crate::ManagedMod;
 /// to_install / to_uninstall are the slices from state.compute_pending().
 /// applying: if true, show progress UI with spinners instead of y/n prompt.
 /// progress map e.g. per id "downloading 34%" or use spinner + status text.
+#[allow(clippy::too_many_arguments)]
 pub fn render_commit(
     f: &mut Frame,
     area: Rect,
@@ -101,13 +102,12 @@ fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
         ])
         .split(r);
 
-    let popup = ratatui::layout::Layout::default()
+    ratatui::layout::Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
             Constraint::Percentage((100 - percent_x) / 2),
             Constraint::Percentage(percent_x),
             Constraint::Percentage((100 - percent_x) / 2),
         ])
-        .split(popup_layout[1])[1];
-    popup
+        .split(popup_layout[1])[1]
 }

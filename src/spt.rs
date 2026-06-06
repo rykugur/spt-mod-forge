@@ -149,7 +149,7 @@ impl SptInstall {
                 }
                 if ver.starts_with("4.") && ver.matches('.').count() >= 1 {
                     let clean = ver.trim_end_matches('.');
-                    if clean.len() >= 5 && clean.chars().last().map_or(false, |c| c.is_ascii_digit()) {
+                    if clean.len() >= 5 && clean.chars().last().is_some_and(|c| c.is_ascii_digit()) {
                         return Some(clean.to_string());
                     }
                 }
@@ -171,8 +171,6 @@ impl SptInstall {
                     let c = bytes[j] as char;
                     if c.is_ascii_digit() || c == '.' {
                         ver.push(c);
-                    } else if c.is_ascii_alphabetic() && !ver.is_empty() {
-                        break;
                     } else if !ver.is_empty() {
                         break;
                     }

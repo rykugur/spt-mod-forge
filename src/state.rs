@@ -159,10 +159,26 @@ impl StateDb {
         rows.collect::<std::result::Result<Vec<_>, _>>().map_err(Into::into)
     }
 
+    /// Clear the recorded installed_files rows for this mod (for uninstall + commit).
+    /// Does not change last_installed_version (caller or later record will manage); after this get_installed_for returns [] and compute_pending will not see has_installed.
+    /// Supporting for Task 10 (left unstaged at commit of only install.rs per pattern).
+    pub fn clear_installed_files(&self, forge_id: i64) -> Result<()> {
+        self.conn.execute(
+            "DELETE FROM installed_files WHERE forge_id = ?1",
+            params![forge_id],
+        )?;
+        // Best to also clear the last_installed_version so re-enable will treat as fresh install (no false "version match").
+        self.conn.execute(
+            "UPDATE managed_mods SET last_installed_version = NULL WHERE forge_id = ?1",
+            params![forge_id],
+        )?;
+        Ok(())
+    }
+
     /// Compute the diff for "commit": what needs install vs uninstall based on desired state vs recorded installed_files.
     /// - to_enable (pending install): desired_enabled=true AND (has no installed_files rows OR version mismatch between last_known and last_installed)
     /// - to_disable (pending uninstall): desired_enabled=false AND has installed_files rows
-    /// Per plan semantics + "On commit: Compare desired_enabled vs. what is currently recorded as installed."
+    ///   Per plan semantics + "On commit: Compare desired_enabled vs. what is currently recorded as installed."
     pub fn compute_pending(&self) -> Result<(Vec<ManagedMod>, Vec<ManagedMod>)> {
         let all = self.get_all_managed()?;
         let mut to_enable: Vec<ManagedMod> = Vec::new();

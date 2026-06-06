@@ -10,10 +10,15 @@
 use rattles::presets::prelude as presets;
 
 pub struct Spinner {
+    #[allow(dead_code)]
     idx: usize,
 }
 
 impl Spinner {
+    pub fn new() -> Self {
+        Self { idx: 0 }
+    }
+
     pub fn frame(&mut self) -> &'static str {
         // simplest per ratatui example + plan note ("many just do presets::braille().current_frame() on every draw")
         // &mut self to match plan sketch (idx for potential future manual stepping; currently time-driven so frame rate independent)

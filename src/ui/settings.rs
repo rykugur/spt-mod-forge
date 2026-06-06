@@ -57,13 +57,12 @@ fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
         ])
         .split(r);
 
-    let popup = ratatui::layout::Layout::default()
+    ratatui::layout::Layout::default()
         .direction(ratatui::layout::Direction::Horizontal)
         .constraints([
             ratatui::layout::Constraint::Percentage((100 - percent_x) / 2),
             ratatui::layout::Constraint::Percentage(percent_x),
             ratatui::layout::Constraint::Percentage((100 - percent_x) / 2),
         ])
-        .split(popup_layout[1])[1];
-    popup
+        .split(popup_layout[1])[1]
 }
