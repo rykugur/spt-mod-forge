@@ -271,7 +271,7 @@ impl App {
                 f,
                 area,
                 " SPT Path Prompt ",
-                "Enter path containing user/mods/ + BepInEx/ :",
+                "Enter path to SPTarkov root install:",
                 &inp,
                 "Enter: validate+use  |  Esc: quit",
             );
@@ -321,7 +321,7 @@ impl App {
         input: &str,
         help: &str,
     ) {
-        let popup_area = self.centered_rect(60, 28, area);
+        let popup_area = self.centered_rect(60, 32, area);
         f.render_widget(Clear, popup_area);
 
         let block = Block::default()
@@ -332,7 +332,15 @@ impl App {
         f.render_widget(&block, popup_area);
 
         let inner = block.inner(popup_area);
-        let text = format!("{}\n\n> {}\n\n{}", label, input, help);
+
+        let mut text = format!("{}\n\n> {}\n\n{}", label, input, help);
+
+        // Show feedback/status inside the prompt (e.g. validation errors).
+        // This was previously only shown in the bottom status bar, which is hidden during prompts.
+        if let Some(ref st) = self.status {
+            text.push_str(&format!("\n\n{}", st));
+        }
+
         let p = Paragraph::new(text).style(Style::default().fg(self.theme.accent()));
         f.render_widget(p, inner);
     }
@@ -552,7 +560,9 @@ impl App {
             KeyCode::Esc => return true, // quit without token (hard error path left to caller if re-enter)
             KeyCode::Enter => {
                 let trimmed = input.trim();
-                if !trimmed.is_empty() {
+                if trimmed.is_empty() {
+                    self.status = Some("Please enter your FORGE_API_TOKEN".into());
+                } else {
                     std::env::set_var("FORGE_API_TOKEN", trimmed);
                     match ForgeClient::new() {
                         Ok(f) => {
@@ -568,8 +578,12 @@ impl App {
                     }
                 }
             }
-            KeyCode::Char(c) => input.push(c),
+            KeyCode::Char(c) => {
+                self.status = None; // clear previous error while typing
+                input.push(c);
+            }
             KeyCode::Backspace => {
+                self.status = None;
                 input.pop();
             }
             _ => {}
@@ -582,7 +596,9 @@ impl App {
             KeyCode::Esc => return true,
             KeyCode::Enter => {
                 let p = input.trim().to_string();
-                if !p.is_empty() {
+                if p.is_empty() {
+                    self.status = Some("Please enter a path to your SPTarkov root install".into());
+                } else {
                     match SptInstall::resolve(&p, Some(p.clone())) {
                         Ok(s) => {
                             self.spt = Some(s);
@@ -606,14 +622,21 @@ impl App {
                             self.status = Some("SPT path accepted".into());
                         }
                         Err(e) => {
-                            self.status = Some(format!("SPT invalid ({}): need user/mods + BepInEx", e));
+                            self.status = Some(format!(
+                                "Invalid SPT path: {}. Enter the root directory (e.g. ~/Games/SPTarkov).",
+                                e
+                            ));
                             // stay in prompt
                         }
                     }
                 }
             }
-            KeyCode::Char(c) => input.push(c),
+            KeyCode::Char(c) => {
+                self.status = None; // clear previous validation message while typing
+                input.push(c);
+            }
             KeyCode::Backspace => {
+                self.status = None;
                 input.pop();
             }
             _ => {}
