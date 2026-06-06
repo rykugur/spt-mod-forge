@@ -3,6 +3,24 @@ name = "spt-mod-forge"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+# NOTE: [lib] path redirect (from prior task) makes src/models.rs the lib root to support `cargo test --lib` per plan steps.
+path = "src/models.rs"
+
 [dependencies]
 crossterm = "0.28"
 ratatui = "0.29"
+rattles = "0.3"
+directories = "5.0"
+toml = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+zip = "2"
+thiserror = "1"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }  # only for timestamps if desired; strings also fine
+
+[dev-dependencies]
+serde_json = "1"
+tempfile = "3"

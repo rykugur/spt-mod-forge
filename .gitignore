@@ -38,3 +38,10 @@ Thumbs.db
 # Git worktrees (isolated dev workspaces per using-git-worktrees skill)
 .worktrees/
 worktrees/
+
+# App runtime (XDG paths, never CWD, but ignore in case of manual copies)
+*.db
+state.db
+spt-mod-forge.db
+# Cache (user may have local .cache copy during dev)
+.cache/
