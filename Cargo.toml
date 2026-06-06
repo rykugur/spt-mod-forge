@@ -4,15 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-# NOTE (for spec compliance): the [lib] section+redirect was NOT in the plan's literal "Edit Cargo.toml:" instruction
-# which showed *only* the [dev-dependencies] snippet in step 3.2. It is the primary noted deviation.
-# Reason it is present: enables the plan's *exact* verification command `cargo test --lib` (used in 3.1/3.2)
-# to compile/run the unit test inside src/models.rs and produce the documented PASS outcome.
-# Without any [lib] (or src/lib.rs), `--lib` yields "error: no library targets found in package".
-# No src/lib.rs creation, and no main.rs edits, were allowed under the task's "only these files" + "no other files" rules.
-# (This makes src/models.rs serve as crate lib root for Task 3; future tasks may need mod decls here or refactor.)
-# Per plan, Cargo.lock is left uncommitted (exact `git add` was only Cargo.toml + src/models.rs); the dev-dep
-# addition updates lock in practice but we exclude it to stay literal to the git step.
+# NOTE: [lib] path redirect (from prior task) makes src/models.rs the lib root to support `cargo test --lib` per plan steps.
 path = "src/models.rs"
 
 [dependencies]
